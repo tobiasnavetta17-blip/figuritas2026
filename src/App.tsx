@@ -779,7 +779,49 @@ function StatsScreen({ stickers, isPremium, onUnlock }) {
 }
 
 // —— LOGIN SCREEN
-function LoginScreen() {
+// --- UPDATE PASSWORD SCREEN
+    function UpdatePasswordScreen() {
+      const [password, setPassword] = React.useState('');
+        const [loading, setLoading] = React.useState(false);
+          const [error, setError] = React.useState('');
+            const [msg, setMsg] = React.useState('');
+
+              const handleUpdate = async () => {
+                  if (!password) { setError('Ingresá una nueva contraseña.'); return; }
+                      setLoading(true); setError(''); setMsg('');
+                          try {
+                                const { error: e } = await supabase.auth.updateUser({ password });
+                                      if (e) throw e;
+                                            setMsg('✅ ¡Contraseña actualizada! Ya podés usar tu cuenta.');
+                                                } catch (ex: any) { setError(ex.message); } finally { setLoading(false); }
+                                                  };
+
+                                                    return (
+                                                        <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#f5f5f5' }}>
+                                                              <div style={{ background:'white', padding:32, borderRadius:16, width:340, boxShadow:'0 4px 24px #0001' }}>
+                                                                      <h2 style={{ textAlign:'center', marginBottom:24 }}>Nueva contraseña</h2>
+                                                                              {error && <div style={{ color:'red', marginBottom:12, fontSize:13 }}>{error}</div>}
+                                                                                      {msg && <div style={{ color:'green', marginBottom:12, fontSize:13 }}>{msg}</div>}
+                                                                                              <input
+                                                                                                        type="password"
+                                                                                                                  placeholder="Nueva contraseña"
+                                                                                                                            value={password}
+                                                                                                                                      onChange={e => setPassword(e.target.value)}
+                                                                                                                                                style={{ width:'100%', padding:'10px 14px', borderRadius:8, border:'1px solid #ddd', marginBottom:12, fontSize:15, boxSizing:'border-box' }}
+                                                                                                                                                        />
+                                                                                                                                                                <button
+                                                                                                                                                                          onClick={handleUpdate}
+                                                                                                                                                                                    disabled={loading}
+                                                                                                                                                                                              style={{ width:'100%', padding:'12px', background:'#c8a800', color:'white', border:'none', borderRadius:8, fontSize:16, fontWeight:700, cursor:'pointer' }}
+                                                                                                                                                                                                      >
+                                                                                                                                                                                                                {loading ? 'Actualizando...' : 'Actualizar contraseña'}
+                                                                                                                                                                                                                        </button>
+                                                                                                                                                                                                                              </div>
+                                                                                                                                                                                                                                  </div>
+                                                                                                                                                                                                                                    );
+                                                                                                                                                                                                                                    }
+
+                                                                                                                                                                                                                                    function LoginScreen() {
   const [mode, setMode] = useState('login');
     const [email, setEmail] = useState('');
       const [password, setPassword] = useState('');
