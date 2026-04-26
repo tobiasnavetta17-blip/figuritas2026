@@ -964,22 +964,6 @@ export default function App() {
     }
   };
 
-  const handleReset = async () => {
-    if (!email) { setError('Ingresá tu email para recuperar la contraseña'); return; }
-    setLoading(true); setError(''); setMsg('');
-    try {
-      const { error: resetErr } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin,
-      });
-      if (resetErr) throw resetErr;
-      setMsg('¡Email de recuperación enviado! Revisá tu casilla.');
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div style={{
       background:C.bg, minHeight:"100vh", maxWidth:480,
