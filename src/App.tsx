@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { supabase } from './supabase.js';
 import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   TEAMS, GRUPOS, TOTAL_ALBUM, LABEL_TIPO,
@@ -777,7 +778,56 @@ function StatsScreen({ stickers, isPremium, onUnlock }) {
   );
 }
 
-// ─── APP ──────────────────────────────────────────────────────────────────────
+// —— LOGIN SCREEN
+function LoginScreen() {
+  const [mode, setMode] = useState('login');
+    const [email, setEmail] = useState('');
+      const [password, setPassword] = useState('');
+        const [loading, setLoading] = useState(false);
+          const [error, setError] = useState('');
+            const [msg, setMsg] = useState('');
+            
+              const handle = async () => {
+                  setLoading(true); setError(''); setMsg('');
+                      try {
+                            if (mode === 'login') {
+                                    const { error } = await supabase.auth.signInWithPassword({ email, password });
+                                            if (error) throw error;
+                                                  } else {
+                                                          const { error } = await supabase.auth.signUp({ email, password });
+                                                                  if (error) throw error;
+                                                                          setMsg('Revisá tu email para confirmar el registro.');
+                                                                                }
+                                                                                    } catch (e) {
+                                                                                          setError(e.message || 'Error desconocido');
+                                                                                              }
+                                                                                                  setLoading(false);
+                                                                                                    };
+                                                                                                    
+                                                                                                      return (
+                                                                                                          <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', minHeight:'100vh', background:C.bg, fontFamily:"'Barlow Condensed',sans-serif", padding:'20px' }}>
+                                                                                                                <div style={{ background:'#fff', borderRadius:16, padding:'32px 28px', width:'100%', maxWidth:360, boxShadow:'0 4px 24px rgba(0,0,0,0.12)' }}>
+                                                                                                                        <div style={{ textAlign:'center', marginBottom:24 }}>
+                                                                                                                                  <div style={{ fontSize:28, fontWeight:900, color:C.dark }}>🏆 MUNDIAL 2026</div>
+                                                                                                                                            <div style={{ fontSize:12, color:C.muted, letterSpacing:1 }}>CONTROL DE FIGURITAS</div>
+                                                                                                                                                    </div>
+                                                                                                                                                            <div style={{ display:'flex', marginBottom:20, borderRadius:8, overflow:'hidden', border:`1px solid ${C.border}` }}>
+                                                                                                                                                                      <button onClick={() => setMode('login')} style={{ flex:1, padding:'10px', border:'none', cursor:'pointer', fontFamily:'inherit', fontWeight:700, fontSize:14, background: mode==='login' ? C.gold : '#fff', color: mode==='login' ? '#fff' : C.dark }}>INICIAR SESIÓN</button>
+                                                                                                                                                                                <button onClick={() => setMode('register')} style={{ flex:1, padding:'10px', border:'none', cursor:'pointer', fontFamily:'inherit', fontWeight:700, fontSize:14, background: mode==='register' ? C.gold : '#fff', color: mode==='register' ? '#fff' : C.dark }}>REGISTRARSE</button>
+                                                                                                                                                                                        </div>
+                                                                                                                                                                                                <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} style={{ width:'100%', padding:'12px', marginBottom:12, borderRadius:8, border:`1px solid ${C.border}`, fontFamily:'inherit', fontSize:15, boxSizing:'border-box' }} />
+                                                                                                                                                                                                        <input type="password" placeholder="Contraseña" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key==='Enter' && handle()} style={{ width:'100%', padding:'12px', marginBottom:16, borderRadius:8, border:`1px solid ${C.border}`, fontFamily:'inherit', fontSize:15, boxSizing:'border-box' }} />
+                                                                                                                                                                                                                {error && <div style={{ color:'#c0392b', fontSize:13, marginBottom:12, textAlign:'center' }}>{error}</div>}
+                                                                                                                                                                                                                        {msg && <div style={{ color:C.green, fontSize:13, marginBottom:12, textAlign:'center' }}>{msg}</div>}
+                                                                                                                                                                                                                                <button onClick={handle} disabled={loading} style={{ width:'100%', padding:'13px', borderRadius:8, border:'none', background:C.gold, color:'#fff', fontFamily:'inherit', fontWeight:800, fontSize:16, cursor:'pointer', letterSpacing:1 }}>
+                                                                                                                                                                                                                                          {loading ? 'Cargando...' : mode==='login' ? 'ENTRAR' : 'REGISTRARSE'}
+                                                                                                                                                                                                                                                  </button>
+                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                                                                              );
+                                                                                                                                                                                                                                                              }
+                                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                              // ─── APP ──────────────────────────────────────────────────────────────────────
 export default function App() {
   const [stickers,  setStickers]  = useState(() => load("stk_v1", {}));
   const [openItem,  setOpenItem]  = useState(null);
@@ -786,8 +836,48 @@ export default function App() {
   const [tab,       setTab]       = useState("album");
   const [modal,     setModal]     = useState(null);
   const [isPremium, setIsPremium] = useState(() => load("prm_v1", false));
+    const [session, setSession] = useState(null);
+      const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => { save("stk_v1", stickers); }, [stickers]);
+
+    // —— SUPABASE AUTH
+      useEffect(() => {
+          supabase.auth.getSession().then(({ data: { session } }) => {
+                setSession(session);
+                      setAuthLoading(false);
+                          });
+                              const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+                                    setSession(session);
+                                          setAuthLoading(false);
+                                              });
+                                                  return () => subscription.unsubscribe();
+                                                    }, []);
+
+                                                      // Cargar stickers desde Supabase cuando el usuario inicia sesión
+                                                        useEffect(() => {
+                                                            if (!session) return;
+                                                                const userId = session.user.id;
+                                                                    supabase.from('usuarios').select('stickers').eq('id', userId).single()
+                                                                          .then(({ data, error }) => {
+                                                                                  if (data && data.stickers) {
+                                                                                            setStickers(data.stickers);
+                                                                                                    } else if (error && error.code === 'PGRST116') {
+                                                                                                              // El usuario no tiene fila todavía, la creamos
+                                                                                                                        supabase.from('usuarios').insert({ id: userId, stickers: {} });
+                                                                                                                                }
+                                                                                                                                      });
+                                                                                                                                        }, [session]);
+
+                                                                                                                                          // Guardar stickers en Supabase automáticamente con debounce
+                                                                                                                                            useEffect(() => {
+                                                                                                                                                if (!session) return;
+                                                                                                                                                    const userId = session.user.id;
+                                                                                                                                                        const timer = setTimeout(() => {
+                                                                                                                                                              supabase.from('usuarios').upsert({ id: userId, stickers }).then(() => {});
+                                                                                                                                                                  }, 800);
+                                                                                                                                                                      return () => clearTimeout(timer);
+                                                                                                                                                                        }, [stickers, session]);
 
   const cycleSticker = useCallback((id) => {
     setStickers(prev => {
@@ -828,6 +918,16 @@ export default function App() {
       setStickers({});
     }
   };
+
+    // —— AUTH SCREEN
+      if (authLoading) return (
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", background:C.bg, fontFamily:"'Barlow Condensed',sans-serif" }}>
+                <p style={{ color:C.dark, fontSize:18 }}>Cargando...</p>
+                    </div>
+                      );
+
+                        if (!session) return <LoginScreen />;
+
 
   return (
     <div style={{
