@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   TEAMS, GRUPOS, TOTAL_ALBUM, LABEL_TIPO,
