@@ -822,6 +822,25 @@ function LoginScreen() {
                                                                                                                                                                                                                                 <button onClick={handle} disabled={loading} style={{ width:'100%', padding:'13px', borderRadius:8, border:'none', background:C.gold, color:'#fff', fontFamily:'inherit', fontWeight:800, fontSize:16, cursor:'pointer', letterSpacing:1 }}>
                                                                                                                                                                                                                                           {loading ? 'Cargando...' : mode==='login' ? 'ENTRAR' : 'REGISTRARSE'}
                                                                                                                                                                                                                                                   </button>
+
+          {mode === 'login' && (
+            <button
+              onClick={handleReset}
+              disabled={loading}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#b8860b',
+                cursor: 'pointer',
+                fontSize: 13,
+                marginTop: 8,
+                textDecoration: 'underline',
+                fontFamily: 'inherit',
+              }}
+            >
+              ¿Olvidaste tu contraseña?
+            </button>
+          )}
                                                                                                                                                                                                                                                         </div>
                                                                                                                                                                                                                                                             </div>
                                                                                                                                                                                                                                                               );
@@ -928,6 +947,38 @@ export default function App() {
 
                         if (!session) return <LoginScreen />;
 
+
+  const handleReset = async () => {
+    if (!email) { setError('Ingresá tu email para recuperar la contraseña'); return; }
+    setLoading(true); setError(''); setMsg('');
+    try {
+      const { error: resetErr } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin,
+      });
+      if (resetErr) throw resetErr;
+      setMsg('¡Email de recuperación enviado! Revisá tu casilla.');
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReset = async () => {
+    if (!email) { setError('Ingresá tu email para recuperar la contraseña'); return; }
+    setLoading(true); setError(''); setMsg('');
+    try {
+      const { error: resetErr } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin,
+      });
+      if (resetErr) throw resetErr;
+      setMsg('¡Email de recuperación enviado! Revisá tu casilla.');
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div style={{
