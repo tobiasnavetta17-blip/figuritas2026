@@ -803,7 +803,17 @@ function LoginScreen() {
                                                                                               }
                                                                                                   setLoading(false);
                                                                                                     };
-                                                                                                    
+
+                                                  const handleReset = async () => {
+                                                      if (!email) { setError('Ingresá tu email para recuperar la contraseña.'); return; }
+                                                          setLoading(true); setError(''); setMsg('');
+                                                              try {
+                                                                    const { error: e2 } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
+                                                                          if (e2) throw e2;
+                                                                                setMsg('✅ Email de recuperación enviado! Revisá tu casilla.');
+                                                                                    } catch (ex) { setError(ex.message); } finally { setLoading(false); }
+                                                                                      };
+                                                                                                                                                                                          
                                                                                                       return (
                                                                                                           <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', minHeight:'100vh', background:C.bg, fontFamily:"'Barlow Condensed',sans-serif", padding:'20px' }}>
                                                                                                                 <div style={{ background:'#fff', borderRadius:16, padding:'32px 28px', width:'100%', maxWidth:360, boxShadow:'0 4px 24px rgba(0,0,0,0.12)' }}>
@@ -947,22 +957,6 @@ export default function App() {
 
                         if (!session) return <LoginScreen />;
 
-
-  const handleReset = async () => {
-    if (!email) { setError('Ingresá tu email para recuperar la contraseña'); return; }
-    setLoading(true); setError(''); setMsg('');
-    try {
-      const { error: resetErr } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin,
-      });
-      if (resetErr) throw resetErr;
-      setMsg('¡Email de recuperación enviado! Revisá tu casilla.');
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div style={{
