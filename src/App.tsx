@@ -1105,7 +1105,12 @@ export default function App() {
     const [session, setSession] = useState(null);
       const [authLoading, setAuthLoading] = useState(true);
 
-  useEffect(() => { save("stk_v1", stickers); }, [stickers]);
+  useEffect(() => {
+    save("stk_v1", stickers);
+        if (session?.user) {
+              supabase.from('usuarios').update({ stickers_data: stickers }).eq('id', session.user.id);
+                  }
+                    }, [stickers, session]);
 
                     // Load userName from Supabase usuarios
                       React.useEffect(() => {
