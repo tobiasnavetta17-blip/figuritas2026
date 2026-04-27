@@ -1163,7 +1163,7 @@ export default function App() {
 
     // —— SUPABASE AUTH
       useEffect(() => {
-          supabase.auth.getSession().then(({ data: { session } }) => async ({ data: { session } }) => {
+          supabase.auth.getSession().then(async ({ data: { session } }) => {
                             setSession(session);
                                                 setAuthLoading(false);
                                                                     if (session?.user?.id) {
@@ -1177,7 +1177,7 @@ export default function App() {
                                                                                                                                                                                                                                                               }
                                                                                                                                                                                                                                                                                   }
                                                                                                                                                                                                                                                                                                     });
-                              const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => async (_event, session) => {
+                              const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
                                                                                                                                                                                                                                                                                                                                       setSession(session);
                                                                                                                                                                                                                                                                                                                                                               setAuthLoading(false);
                                                                                                                                                                                                                                                                                                                                                                                       if (session?.user?.id) {
