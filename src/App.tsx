@@ -1173,6 +1173,7 @@ export default function App() {
       }
     };
 
+    const timeoutId = setTimeout(() => setAuthLoading(false), 3000);
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       try {
         setSession(session);
@@ -1198,7 +1199,7 @@ export default function App() {
       setAuthLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => { clearTimeout(timeoutId); subscription.unsubscribe(); };
   }, []);
 
 
