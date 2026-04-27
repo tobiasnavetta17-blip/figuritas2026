@@ -1108,7 +1108,9 @@ export default function App() {
   useEffect(() => {
     save("stk_v1", stickers);
         if (session?.user) {
-              supabase.from('usuarios').update({ stickers_data: stickers }).eq('id', session.user.id);
+              supabase.from('usuarios')
+              .upsert({ id: session.user.id, email: session.user.email, stickers_data: stickers }, { onConflict: 'id' })
+                            .then(({ error }) => { if (error) console.error('Error guardando stickers:', error); });
                   }
                     }, [stickers, session]);
 
