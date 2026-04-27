@@ -1178,11 +1178,16 @@ export default function App() {
     };
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      if (session?.user?.email) {
-        await loadUserData(session.user.email);
+      try {
+        setSession(session);
+        if (session?.user?.email) {
+          await loadUserData(session.user.email);
+        }
+      } catch (err) {
+        console.error('[getSession] error:', err);
+      } finally {
+        setAuthLoading(false);
       }
-      setAuthLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
