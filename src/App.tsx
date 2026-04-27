@@ -1204,11 +1204,12 @@ export default function App() {
                                                       // Cargar stickers desde Supabase cuando el usuario inicia sesión
                                                         useEffect(() => {
                                                             if (!session) return;
-                                                                const userId = session.user.id;
-                                                                    supabase.from('usuarios').select('stickers').eq('id', userId).single()
+                                                                const email = session.user.email;
+                                                                    supabase.from('usuarios').select('stickers_data, is_premium').eq('email', email).single()
                                                                           .then(({ data, error }) => {
-                                                                                  if (data && data.stickers) {
-                                                                                            setStickers(data.stickers);
+                                                                                  if (data) {
+                                                                                            setStickers(data.stickers_data || {});
+                                                                                            setIsPremium(data.is_premium || false);
                                                                                                     } else if (error && error.code === 'PGRST116') {
                                                                                                               // El usuario no tiene fila todavía, la creamos
                                                                                                                         supabase.from('usuarios').insert({ id: userId, stickers: {} });
