@@ -1107,7 +1107,7 @@ export default function App() {
 
   useEffect(() => {
     save("stk_v1", stickers);
-        if (session?.user) {
+        if (session?.user && Object.keys(stickers).length > 0) {
               console.log('[upsert stickers] session:', session, 'email:', session?.user?.email, 'stickers:', stickers);
               console.log('[upsert stickers] session:', session, 'email:', session?.user?.email, 'stickers:', stickers);
               supabase.from('usuarios')
@@ -1225,6 +1225,7 @@ export default function App() {
                                                                                                                                           // Guardar stickers en Supabase automáticamente con debounce
                                                                                                                                             useEffect(() => {
                                                                                                                                                 if (!session) return;
+                                                                                                                                                if (Object.keys(stickers).length === 0) return;
                                                                                                                                                     const userId = session.user.id;
                                                                                                                                                         const timer = setTimeout(() => {
                                                                                                                                                               supabase.from('usuarios').upsert({ id: userId, stickers }).then(() => {});
