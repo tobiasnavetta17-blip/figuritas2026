@@ -1092,7 +1092,7 @@ function StatsScreen({ stickers, isPremium, onUnlock }) {
                                                                                                                                                                                                                                                               
                                                                                                                                                                                                                                                               // ─── APP ──────────────────────────────────────────────────────────────────────
 export default function App() {
-  const [stickers,  setStickers]  = useState({});
+  const [stickers,  setStickers]  = useState(load('stk_v1', {}));
   const [openItem,  setOpenItem]  = useState(null);
   const [search,    setSearch]    = useState("");
   const [filter,    setFilter]    = useState("all");
@@ -1104,14 +1104,11 @@ export default function App() {
   const [userName, setUserName] = React.useState('');
     const [session, setSession] = useState(null);
       const [authLoading, setAuthLoading] = useState(true);
-  // Guardar stickers en Supabase
+  // Guardar stickers en localStorage
   useEffect(() => {
-    if (!session?.user?.email || Object.keys(stickers).length === 0) return;
-    supabase
-      .from('usuarios')
-      .upsert({ email: session.user.email, stickers_data: stickers }, { onConflict: 'email' })
-      .then(({ error }) => { if (error) console.error("Error guardando stickers:", error); });
-  }, [stickers, session]);
+    if (Object.keys(stickers).length === 0) return;
+    save('stk_v1', stickers);
+  }, [stickers]);
 
                     // Load userName from Supabase usuarios
                       React.useEffect(() => {
@@ -1167,12 +1164,11 @@ export default function App() {
     const loadUserData = async (email: string) => {
       const { data, error } = await supabase
         .from('usuarios')
-        .select('stickers_data, is_premium')
+        .select('is_premium')
         .eq('email', email)
         .single();
       console.log('[loadUserData] data:', data, 'error:', error);
       if (data) {
-        setStickers(data.stickers_data || {});
         setIsPremium(data.is_premium || false);
       }
     };
@@ -1196,7 +1192,6 @@ export default function App() {
         await loadUserData(session.user.email);
         setAuthLoading(false);
       } else if (_event === 'SIGNED_OUT') {
-        setStickers({});
         setIsPremium(false);
         setAuthLoading(false);
       }
