@@ -1,0 +1,57 @@
+1160:                                                                                                                                                                                                                                                                                                                                       }, []);
+1161: 
+1162:   // —— SUPABASE AUTH
+1163:   useEffect(() => {
+1164:     const loadUserData = async (email: string) => {
+1165:       const { data, error } = await supabase
+1166:         .from('usuarios')
+1167:         .select('is_premium')
+1168:         .eq('email', email)
+1169:         .single();
+1170:       console.log('[loadUserData] data:', data, 'error:', error);
+1171:       if (data) {
+1172:         setIsPremium(data.is_premium || false);
+1173:       }
+1174:     };
+1175: 
+1176:     supabase.auth.getSession().then(async ({ data: { session } }) => {
+1177:       try {
+1178:         setSession(session);
+1179:         if (session?.user?.email) {
+1180:           await loadUserData(session.user.email);
+1181:         }
+1182:       } catch (err) {
+1183:         console.error('[getSession] error:', err);
+1184:       } finally {
+1185:         setAuthLoading(false);
+1186:       }
+1187:     });
+1188: 
+1189:     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+1190:       setSession(session);
+1191:       if (_event === 'SIGNED_IN' && session?.user?.email) {
+1192:         await loadUserData(session.user.email);
+1193:         setAuthLoading(false);
+1194:       } else if (_event === 'SIGNED_OUT') {
+1195:         setIsPremium(false);
+1196:         setAuthLoading(false);
+1197:       }
+1198:       setAuthLoading(false);
+1199:     });
+1200: 
+1201:     return () => subscription.unsubscribe();
+1202:   }, []);
+1203: 
+1204: 
+1205:   const cycleSticker = useCallback((id) => {
+1206:     setStickers(prev => {
+1207:       const cur  = prev[id] ?? 0;
+1208:       const next = cur >= 2 ? 0 : cur + 1;
+1209:       if (next === 0) { const { [id]:_, ...rest } = prev; return rest; }
+1210:       return { ...prev, [id]: next };
+1211:     });
+1212:   }, []);
+1213: 
+1214:   const stats = useMemo(() => {
+1215:     const numHave = Object.entries(stickers).filter(([k,v]) => !isNaN(Number(k)) && v >= 1).length;
+1216:     const numRep  = Object.entries(stickers).filter(([k,v]) => !isNaN(Number(k)) && v >= 2).length;

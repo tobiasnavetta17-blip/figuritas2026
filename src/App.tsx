@@ -598,7 +598,7 @@ function PaymentReturnScreen({ state, onClose }) {
                                                     async function saveName() {
                                                         if (!session?.user?.id) return;
                                                             setSaving(true);
-                                                                await supabase.from('usuarios').update({ nombre: name }).eq('id', session.user.id);
+                                                                await supabase.from('usuarios').update({ nombre: name }).eq('email', session.user.email);
                                                                     setUserName(name);
                                                                         setSaving(false);
                                                                             setSaved(true);
