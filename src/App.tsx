@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { supabase } from './supabase.js';
-import { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   TEAMS, GRUPOS, TOTAL_ALBUM, LABEL_TIPO,
   SECCIONES_LIBRES, SECCIONES_PREMIUM,
@@ -527,7 +527,48 @@ function ImportExportModal({ stickers, onImport, onClose, isPremium, onUnlock })
 }
 
 // ─── PAYWALL ──────────────────────────────────────────────────────────────────
-function Paywall({ onClose, onActivate }) {
+function Paywall({ onClose, onActivate, session }) {
+                                                                                  const [loading, setLoading] = React.useState(false);
+
+                                                                                    const handleMPPayment = async () => {
+                                                                                        setLoading(true);
+                                                                                            try {
+                                                                                                  const res = await fetch('https://api.mercadopago.com/checkout/preferences', {
+                                                                                                          method: 'POST',
+                                                                                                                  headers: {
+                                                                                                                            'Content-Type': 'application/json',
+                                                                                                                                      'Authorization': 'Bearer APP_USR-3532237601321528-042611-f0abe2e43caac1aa14f47687a2e7bb19-742790793',
+                                                                                                                                              },
+                                                                                                                                                      body: JSON.stringify({
+                                                                                                                                                                items: [{
+                                                                                                                                                                            title: 'Figuritas 2026 - Acceso Premium',
+                                                                                                                                                                                        quantity: 1,
+                                                                                                                                                                                                    unit_price: 1500,
+                                                                                                                                                                                                                currency_id: 'ARS',
+                                                                                                                                                                                                                          }],
+                                                                                                                                                                                                                                    back_urls: {
+                                                                                                                                                                                                                                                success: window.location.origin + window.location.pathname + '?payment=success',
+                                                                                                                                                                                                                                                            failure: window.location.origin + window.location.pathname + '?payment=failure',
+                                                                                                                                                                                                                                                                        pending: window.location.origin + window.location.pathname + '?payment=pending',
+                                                                                                                                                                                                                                                                                  },
+                                                                                                                                                                                                                                                                                            auto_return: 'approved',
+                                                                                                                                                                                                                                                                                                      external_reference: session?.user?.id || 'anonymous',
+                                                                                                                                                                                                                                                                                                              }),
+                                                                                                                                                                                                                                                                                                                    });
+                                                                                                                                                                                                                                                                                                                          const data = await res.json();
+                                                                                                                                                                                                                                                                                                                                if (data.init_point) {
+                                                                                                                                                                                                                                                                                                                                        window.location.href = data.init_point;
+                                                                                                                                                                                                                                                                                                                                              } else {
+                                                                                                                                                                                                                                                                                                                                                      console.error('MP error:', data);
+                                                                                                                                                                                                                                                                                                                                                              alert('Error al iniciar el pago. Intenta nuevamente.');
+                                                                                                                                                                                                                                                                                                                                                                      setLoading(false);
+                                                                                                                                                                                                                                                                                                                                                                            }
+                                                                                                                                                                                                                                                                                                                                                                                } catch (e) {
+                                                                                                                                                                                                                                                                                                                                                                                      console.error('MP fetch error:', e);
+                                                                                                                                                                                                                                                                                                                                                                                            alert('Error de conexion. Intenta nuevamente.');
+                                                                                                                                                                                                                                                                                                                                                                                                  setLoading(false);
+                                                                                                                                                                                                                                                                                                                                                                                                      }
+                                                                                                                                                                                                                                                                                                                                                                                                        };
   return (
     <div style={{
       position:"fixed", inset:0, background:"rgba(0,0,0,0.78)",
@@ -571,7 +612,7 @@ function Paywall({ onClose, onActivate }) {
           <div style={{ color:C.muted, fontSize:9, letterSpacing:2 }}>PAGO ÚNICO · SIN SUSCRIPCIÓN</div>
         </div>
 
-        <button onClick={onActivate} style={{
+        <button onClick={handleMPPayment} disabled={loading} style={{
           width:"100%", padding:15, border:"none",
           background:`linear-gradient(135deg,${C.gold},${C.goldL})`,
           borderRadius:12, color:C.dark, fontSize:17, fontWeight:900,
@@ -912,6 +953,15 @@ export default function App() {
 
   useEffect(() => { save("stk_v1", stickers); }, [stickers]);
 
+                                                // Handle MP payment success callback
+                                                  useEffect(() => {
+                                                      const params = new URLSearchParams(window.location.search);
+                                                          if (params.get('payment') === 'success' || params.get('status') === 'approved') {
+                                                                activate();
+                                                                      window.history.replaceState({}, '', window.location.pathname);
+                                                                          }
+                                                                            }, [session]);
+
     // —— SUPABASE AUTH
       useEffect(() => {
           supabase.auth.getSession().then(({ data: { session } }) => {
@@ -983,8 +1033,15 @@ export default function App() {
   }, [search, filter, stickers]);
 
   const toggleItem = useCallback(id => setOpenItem(prev => prev === id ? null : id), []);
-  const activate   = () => { setIsPremium(true); save("prm_v1", true); setModal(null); };
-  const resetAll   = () => {
+  const activate    = async () => {
+                    setIsPremium(true);
+                        save("prm_v1", true);
+                            setModal(null);
+                                if (session?.user?.id) {
+                                      await supabase.from('usuarios').update({ is_premium: true }).eq('id', session.user.id);
+                                          }
+                                            };
+                                              const resetAll   = () => {
     if (window.confirm("¿Resetear toda tu colección? No se puede deshacer.")) {
       setStickers({});
     }
@@ -1293,7 +1350,7 @@ export default function App() {
         />
       )}
       {modal === "paywall" && (
-        <Paywall onClose={() => setModal(null)} onActivate={activate} />
+        <Paywall onClose={() => setModal(null)} onActivate={activate} session={session} />
       )}
     </div>
   );
