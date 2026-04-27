@@ -1113,7 +1113,7 @@ export default function App() {
                     // Load userName from Supabase usuarios
                       React.useEffect(() => {
                           if (!session?.user?.id) return;
-                              supabase.from('usuarios').select('nombre').eq('id', session.user.id).single()
+                              supabase.from('usuarios').select('nombre').eq('email', session.user.email).single()
                                     .then(({ data }) => { if (data?.nombre) setUserName(data.nombre); });
                                       }, [session]);
 
@@ -1241,7 +1241,7 @@ export default function App() {
                         save("prm_v1", true);
                             setModal(null);
                                 if (session?.user?.id) {
-                                      await supabase.from('usuarios').update({ is_premium: true }).eq('id', session.user.id);
+                                      await supabase.from('usuarios').update({ is_premium: true }).eq('email', session.user.email);
                                           }
                                             };
                                               const resetAll   = () => {
