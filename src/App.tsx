@@ -1194,9 +1194,11 @@ export default function App() {
       setSession(session);
       if (_event === 'SIGNED_IN' && session?.user?.email) {
         await loadUserData(session.user.email);
+        setAuthLoading(false);
       } else if (_event === 'SIGNED_OUT') {
         setStickers({});
         setIsPremium(false);
+        setAuthLoading(false);
       }
       setAuthLoading(false);
     });
