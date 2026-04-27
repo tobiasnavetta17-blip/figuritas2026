@@ -1104,17 +1104,14 @@ export default function App() {
   const [userName, setUserName] = React.useState('');
     const [session, setSession] = useState(null);
       const [authLoading, setAuthLoading] = useState(true);
-
+  // Guardar stickers en Supabase
   useEffect(() => {
-    save("stk_v1", stickers);
-        if (session?.user && Object.keys(stickers).length > 0) {
-              console.log('[upsert stickers] session:', session, 'email:', session?.user?.email, 'stickers:', stickers);
-              console.log('[upsert stickers] session:', session, 'email:', session?.user?.email, 'stickers:', stickers);
-              supabase.from('usuarios')
-              .upsert({ email: session.user.email, stickers_data: stickers }, { onConflict: 'email' })
-                            .then(({ error }) => { if (error) console.error('Error guardando stickers:', error); });
-                  }
-                    }, [stickers, session]);
+    if (!session?.user?.email || Object.keys(stickers).length === 0) return;
+    supabase
+      .from('usuarios')
+      .upsert({ email: session.user.email, stickers_data: stickers }, { onConflict: 'email' })
+      .then(({ error }) => { if (error) console.error("Error guardando stickers:", error); });
+  }, [stickers, session]);
 
                     // Load userName from Supabase usuarios
                       React.useEffect(() => {
@@ -1165,73 +1162,43 @@ export default function App() {
                                                                                                                                                                                                                                                                                                                                     }
                                                                                                                                                                                                                                                                                                                                       }, []);
 
-    // —— SUPABASE AUTH
-      useEffect(() => {
-          supabase.auth.getSession().then(async ({ data: { session } }) => {
-                            setSession(session);
-                                                setAuthLoading(false);
-                                                                    if (session?.user?.id) {
-                                                                                          const { data, error } = await supabase.from('usuarios')
-                                                                                                                  .select('stickers_data, is_premium')
-                                                                                                                                          .eq('email', session.user.email)
-                                                                                                                                                                  .single();
-                                                                                                                                                                  console.log('[getSession SELECT] data:', data, 'error:', error);
-                                                                                                                                                                                        if (data) {
-                                                                                                                                                                                                                setStickers(data.stickers_data || {});
-                                                                                                                                                                                                                                        setIsPremium(data.is_premium || false);
-                                                                                                                                                                                                                                                              }
-                                                                                                                                                                                                                                                                                  }
-                                                                                                                                                                                                                                                                                                    });
-                              const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-                                                                                                                                                                                                                                                                                                                                      setSession(session);
-                                                                                                                                                                                                                                                                                                                                                              setAuthLoading(false);
-                                                                                                                                                                                                                                                                                                                                                                                      if (session?.user?.id) {
-                                                                                                                                                                                                                                                                                                                                                                                                                // SIGNED_IN: load stickers and is_premium from Supabase
-                                                                                                                                                                                                                                                                                                                                                                                                                                          const { data, error } = await supabase.from('usuarios')
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      .select('stickers_data, is_premium')
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  .eq('email', session.user.email)
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              .single();
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              console.log('[onAuthStateChange SELECT] data:', data, 'error:', error);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        if (data) {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    setStickers(data.stickers_data || {});
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                setIsPremium(data.is_premium || false);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  } else {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            // SIGNED_OUT: clear local state
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      setStickers({});
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                setIsPremium(false);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        }
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              });
-                                                  return () => subscription.unsubscribe();
-                                                    }, []);
+  // —— SUPABASE AUTH
+  useEffect(() => {
+    const loadUserData = async (email: string) => {
+      const { data, error } = await supabase
+        .from('usuarios')
+        .select('stickers_data, is_premium')
+        .eq('email', email)
+        .single();
+      console.log('[loadUserData] data:', data, 'error:', error);
+      if (data) {
+        setStickers(data.stickers_data || {});
+        setIsPremium(data.is_premium || false);
+      }
+    };
 
-                                                      // Cargar stickers desde Supabase cuando el usuario inicia sesión
-                                                        useEffect(() => {
-                                                            if (!session) return;
-                                                                const email = session.user.email;
-                                                                    supabase.from('usuarios').select('stickers_data, is_premium').eq('email', email).single()
-                                                                          .then(({ data, error }) => {
-                                                                            console.log('[stickers load useEffect SELECT] data:', data, 'error:', error);
-                                                                                  if (data) {
-                                                                                            setStickers(data.stickers_data || {});
-                                                                                            setIsPremium(data.is_premium || false);
-                                                                                                    } else if (error && error.code === 'PGRST116') {
-                                                                                                              // El usuario no tiene fila todavía, la creamos
-                                                                                                                        supabase.from('usuarios').insert({ id: userId, stickers: {} });
-                                                                                                                                }
-                                                                                                                                      });
-                                                                                                                                        }, [session]);
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      setSession(session);
+      if (session?.user?.email) {
+        await loadUserData(session.user.email);
+      }
+      setAuthLoading(false);
+    });
 
-                                                                                                                                          // Guardar stickers en Supabase automáticamente con debounce
-                                                                                                                                            useEffect(() => {
-                                                                                                                                                if (!session) return;
-                                                                                                                                                if (Object.keys(stickers).length === 0) return;
-                                                                                                                                                    const userId = session.user.id;
-                                                                                                                                                        const timer = setTimeout(() => {
-                                                                                                                                                              supabase.from('usuarios').upsert({ id: userId, stickers }).then(() => {});
-                                                                                                                                                                  }, 800);
-                                                                                                                                                                      return () => clearTimeout(timer);
-                                                                                                                                                                        }, [stickers, session]);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      setSession(session);
+      if (_event === 'SIGNED_IN' && session?.user?.email) {
+        await loadUserData(session.user.email);
+      } else if (_event === 'SIGNED_OUT') {
+        setStickers({});
+        setIsPremium(false);
+      }
+      setAuthLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
 
   const cycleSticker = useCallback((id) => {
     setStickers(prev => {
