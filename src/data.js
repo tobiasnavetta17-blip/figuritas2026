@@ -126,3 +126,8 @@ export const SECCION_COCA_COLA = {
     label: `CC ${i + 1}`,
   })),
 };
+export const TEAMS = TODAS_LAS_SELECCIONES;
+export const TOTAL_ALBUM = TOTAL_FIGURITAS;
+export const LABEL_TIPO = [];
+export const SECCIONES_LIBRES = [SECCION_FWC];
+export const SECCIONES_PREMIUM = [SECCION_COCA_COLA];
