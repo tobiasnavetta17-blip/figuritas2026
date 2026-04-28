@@ -131,3 +131,5 @@ export const TOTAL_ALBUM = TOTAL_FIGURITAS;
 export const LABEL_TIPO = [];
 export const SECCIONES_LIBRES = [SECCION_FWC];
 export const SECCIONES_PREMIUM = [SECCION_COCA_COLA];
+
+export const TOTAL_FIGURITAS = 980;
