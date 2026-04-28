@@ -1098,7 +1098,7 @@ export default function App() {
   const [filter,    setFilter]    = useState("all");
   const [tab,       setTab]       = useState("album");
   const [modal,     setModal]     = useState(null);
-  const [isPremium, setIsPremium] = useState(false);
+  const [isPremium, setIsPremium] = useState(() => load('prm_v1', false));
   const [paymentReturn, setPaymentReturn] = React.useState(null);
   const [showAccount, setShowAccount] = React.useState(false);
   const [userName, setUserName] = React.useState('');
@@ -1169,7 +1169,8 @@ export default function App() {
         .single();
       console.log('[loadUserData] data:', data, 'error:', error);
       if (data) {
-        setIsPremium(data.is_premium || false);
+        setIsPremium(data.is_premium === true);
+        save('prm_v1', data.is_premium === true);
       }
     };
 
