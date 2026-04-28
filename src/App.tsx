@@ -277,10 +277,10 @@ function WAModal({ stickers, onClose }) {
   const numericMissing  = Array.from({length:TOTAL_ALBUM}, (_,i) => i+1)
     .filter(n => (stickers[n]??0) === 0);
   const numericRepeated = Object.entries(stickers)
-    .filter(([k,v]) => !isNaN(Number(k)) && v >= 2)
+    .filter(([k,v]) => /^[A-Z]+-([1-9]|1[0-9]|20)$/.test(k) && v >= 2)
     .map(([k]) => Number(k));
   const extraRepeated = Object.entries(stickers)
-    .filter(([k,v]) => isNaN(Number(k)) && v >= 2)
+    .filter(([k,v]) => !/^[A-Z]+-([1-9]|1[0-9]|20)$/.test(k) && v >= 2)
     .map(([k]) => k);
   const allRepeated = [...numericRepeated, ...extraRepeated];
 
@@ -785,9 +785,9 @@ function PaymentReturnScreen({ state, onClose }) {
 
 // ─── STATS ────────────────────────────────────────────────────────────────────
 function StatsScreen({ stickers, isPremium, onUnlock }) {
-  const numHave = Object.entries(stickers).filter(([k,v]) => !isNaN(Number(k)) && v >= 1).length;
-  const numRep  = Object.entries(stickers).filter(([k,v]) => !isNaN(Number(k)) && v >= 2).length;
-  const extHave = Object.entries(stickers).filter(([k,v]) => isNaN(Number(k)) && v >= 1).length;
+  const numHave = Object.entries(stickers).filter(([k,v]) => /^[A-Z]+-([1-9]|1[0-9]|20)$/.test(k) && v >= 1).length;
+  const numRep  = Object.entries(stickers).filter(([k,v]) => /^[A-Z]+-([1-9]|1[0-9]|20)$/.test(k) && v >= 2).length;
+  const extHave = Object.entries(stickers).filter(([k,v]) => !/^[A-Z]+-([1-9]|1[0-9]|20)$/.test(k) && v >= 1).length;
 
   const teamStats = useMemo(() => TEAMS.map(t => {
     const ids = Array.from({length:20}, (_,i) => `${t.id}-${i+1}`);
@@ -1213,8 +1213,8 @@ export default function App() {
   }, []);
 
   const stats = useMemo(() => {
-    const numHave = Object.entries(stickers).filter(([k,v]) => !isNaN(Number(k)) && v >= 1).length;
-    const numRep  = Object.entries(stickers).filter(([k,v]) => !isNaN(Number(k)) && v >= 2).length;
+    const numHave = Object.entries(stickers).filter(([k,v]) => /^[A-Z]+-([1-9]|1[0-9]|20)$/.test(k) && v >= 1).length;
+    const numRep  = Object.entries(stickers).filter(([k,v]) => /^[A-Z]+-([1-9]|1[0-9]|20)$/.test(k) && v >= 2).length;
     return { numHave, numRep };
   }, [stickers]);
 
