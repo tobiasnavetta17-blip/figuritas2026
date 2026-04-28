@@ -1459,50 +1459,88 @@ export default function App() {
       {/* ── TAB ESPECIALES ── */}
       {tab === "especiales" && (
         <div style={{ padding:"13px 12px 100px" }}>
-          <div style={{
-            background:"linear-gradient(135deg,rgba(200,152,31,0.10),rgba(239,200,74,0.06))",
-            border:"1px solid rgba(200,152,31,0.25)",
-            borderRadius:12, padding:"11px 14px", marginBottom:12,
-            fontSize:12, lineHeight:1.7,
-          }}>
-            <strong>💡 Secciones especiales del álbum</strong><br />
-            Las primeras 4 son <strong>gratis</strong>. Las secciones{" "}
-            <span style={{ color:C.gold, fontWeight:800 }}>PREMIUM</span>{" "}
-            (Extra Stickers, Coca-Cola y más) se desbloquean por <strong>$1 único</strong>.
-          </div>
-
-          <div style={{ fontSize:10, fontWeight:900, color:C.muted, letterSpacing:2, margin:"4px 2px 8px" }}>
-            INCLUIDAS — GRATIS
-          </div>
-          {SECCIONES_LIBRES.map(sec => (
-            <SeccionCard
-              key={sec.id} sec={sec} stickers={stickers} onCycle={cycleSticker}
-              isOpen={openItem === sec.id} onOpen={() => toggleItem(sec.id)}
-              isPremium={true} onUnlock={() => setModal("paywall")}
-            />
-          ))}
-
-          <div style={{
-            display:"flex", alignItems:"center", gap:8,
-            fontSize:10, fontWeight:900, color:C.gold,
-            letterSpacing:2, margin:"16px 2px 8px",
-          }}>
-            <span>✨ PREMIUM</span>
-            {!isPremium && (
+          {!isPremium ? (
+            <div style={{ padding:"50px 20px", textAlign:"center" }}>
+              <div style={{ fontSize:52, marginBottom:14 }}>🏆</div>
+              <div style={{ fontSize:21, fontWeight:900, marginBottom:8 }}>Secciones Especiales</div>
+              <div style={{ color:C.muted, fontSize:13, lineHeight:1.7, marginBottom:26 }}>
+                Desbloqueá las 3 secciones especiales del álbum con acceso Premium.
+              </div>
               <button onClick={() => setModal("paywall")} style={{
+                padding:"13px 32px",
                 background:`linear-gradient(135deg,${C.gold},${C.goldL})`,
-                border:"none", borderRadius:12, padding:"2px 10px",
-                color:C.dark, fontSize:9, fontWeight:900, cursor:"pointer",
-              }}>Desbloquear $1</button>
-            )}
-          </div>
-          {SECCIONES_PREMIUM.map(sec => (
-            <SeccionCard
-              key={sec.id} sec={sec} stickers={stickers} onCycle={cycleSticker}
-              isOpen={openItem === sec.id} onOpen={() => toggleItem(sec.id)}
-              isPremium={isPremium} onUnlock={() => setModal("paywall")}
-            />
-          ))}
+                border:"none", borderRadius:12, color:C.dark,
+                fontSize:17, fontWeight:900, cursor:"pointer",
+                boxShadow:`0 4px 18px rgba(200,152,31,0.35)`,
+              }}>
+                Desbloquear por $1 ✨
+              </button>
+            </div>
+          ) : (
+            <>
+              {[
+                {
+                  id:"fwc-intro", name:"FIFA World Cup 2026 – Intro", emoji:"🏆",
+                  color:"#C8981F", tag:"PREMIUM",
+                  desc:"Emblema oficial, mascotas, balonets y emblemas de los 3 países sede",
+                  stickers:[
+                    {n:"00",   label:"00 – MyPanini™"},
+                    {n:"FWC1", label:"FWC1 – Official Emblem"},
+                    {n:"FWC2", label:"FWC2 – Official Emblem 2"},
+                    {n:"FWC3", label:"FWC3 – Official Mascots"},
+                    {n:"FWC4", label:"FWC4 – Official Slogan"},
+                    {n:"FWC5", label:"FWC5 – Official Ball"},
+                    {n:"FWC6", label:"FWC6 – CAN Emblem"},
+                    {n:"FWC7", label:"FWC7 – MEX Emblem"},
+                    {n:"FWC8", label:"FWC8 – USA Emblem"},
+                  ],
+                },
+                {
+                  id:"fwc-history", name:"FIFA World Cup History", emoji:"📖",
+                  color:"#3A7BD5", tag:"PREMIUM",
+                  desc:"Los mundiales más icónicos de la historia de la Copa del Mundo",
+                  stickers:[
+                    {n:"FWC9",  label:"FWC9 – WC Italy 1934"},
+                    {n:"FWC10", label:"FWC10 – WC Brazil 1950"},
+                    {n:"FWC11", label:"FWC11 – WC Switzerland 1954"},
+                    {n:"FWC12", label:"FWC12 – WC Chile 1962"},
+                    {n:"FWC13", label:"FWC13 – WC Germany 1974"},
+                    {n:"FWC14", label:"FWC14 – WC Mexico 1986"},
+                    {n:"FWC15", label:"FWC15 – WC USA 1994"},
+                    {n:"FWC16", label:"FWC16 – WC Korea/Japan 2002"},
+                    {n:"FWC17", label:"FWC17 – WC Germany 2006"},
+                    {n:"FWC18", label:"FWC18 – WC Brazil 2014"},
+                    {n:"FWC19", label:"FWC19 – WC Qatar 2022 ⭐⭐⭐"},
+                  ],
+                },
+                {
+                  id:"coca-cola", name:"Coca-Cola Special Stickers", emoji:"🥤",
+                  color:"#C41E3A", tag:"PREMIUM",
+                  desc:"12 figuritas exclusivas de los mejores jugadores del mundo",
+                  stickers:[
+                    {n:"CC1",  label:"CC1 – Lamine Yamal"},
+                    {n:"CC2",  label:"CC2 – Joshua Kimmich"},
+                    {n:"CC3",  label:"CC3 – Eduardo Camavinga"},
+                    {n:"CC4",  label:"CC4 – Joško Gvardiol"},
+                    {n:"CC5",  label:"CC5 – Federico Valverde"},
+                    {n:"CC6",  label:"CC6 – Virgil van Dijk"},
+                    {n:"CC7",  label:"CC7 – Alphonso Davies"},
+                    {n:"CC8",  label:"CC8 – Raúl Jiménez"},
+                    {n:"CC9",  label:"CC9 – William Saliba"},
+                    {n:"CC10", label:"CC10 – Lautaro Martínez"},
+                    {n:"CC11", label:"CC11 – Harry Kane"},
+                    {n:"CC12", label:"CC12 – Antonee Robinson"},
+                  ],
+                },
+              ].map(sec => (
+                <SeccionCard
+                  key={sec.id} sec={sec} stickers={stickers} onCycle={cycleSticker}
+                  isOpen={openItem === sec.id} onOpen={() => toggleItem(sec.id)}
+                  isPremium={isPremium} onUnlock={() => setModal("paywall")}
+                />
+              ))}
+            </>
+          )}
         </div>
       )}
 
