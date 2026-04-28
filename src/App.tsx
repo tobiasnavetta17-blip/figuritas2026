@@ -63,7 +63,7 @@ function ChipLegend() {
 
 // ─── TARJETA SELECCIÓN ────────────────────────────────────────────────────────
 function TeamCard({ team, stickers, onCycle, isOpen, onOpen }) {
-  const ids  = useMemo(() => Array.from({length:20}, (_,i) => team.base + i), [team.base]);
+  const ids  = useMemo(() => Array.from({length:20}, (_,i) => `${team.id}-${i+1}`), [team.id]);
   const have = ids.filter(id => (stickers[id]??0) >= 1).length;
   const reps = ids.filter(id => (stickers[id]??0) >= 2).length;
   const pct  = Math.round(have / 20 * 100);
@@ -84,7 +84,7 @@ function TeamCard({ team, stickers, onCycle, isOpen, onOpen }) {
         <div style={{ flex:1, textAlign:"left" }}>
           <div style={{ fontSize:14, fontWeight:800, lineHeight:1.1 }}>{team.name}</div>
           <div style={{ fontSize:9, color:C.muted, letterSpacing:1.5 }}>
-            GRUPO {team.group} · #{team.base}–{team.base+19}
+            GRUPO {team.group} · {team.id}-1–{team.id}-20
           </div>
         </div>
         <div style={{ textAlign:"right", flexShrink:0 }}>
@@ -118,7 +118,7 @@ function TeamCard({ team, stickers, onCycle, isOpen, onOpen }) {
             {ids.map((id, i) => (
               <Chip
                 key={id} id={id}
-                label={LABEL_TIPO[i] || `Jugador ${i+1}`}
+                label={`${team.id} ${i+1}`}
                 state={stickers[id] ?? 0}
                 onCycle={() => onCycle(id)}
               />
@@ -790,7 +790,7 @@ function StatsScreen({ stickers, isPremium, onUnlock }) {
   const extHave = Object.entries(stickers).filter(([k,v]) => isNaN(Number(k)) && v >= 1).length;
 
   const teamStats = useMemo(() => TEAMS.map(t => {
-    const ids = Array.from({length:20}, (_,i) => t.base + i);
+    const ids = Array.from({length:20}, (_,i) => `${t.id}-${i+1}`);
     const h   = ids.filter(id => (stickers[id]??0) >= 1).length;
     const r   = ids.filter(id => (stickers[id]??0) >= 2).length;
     return { ...t, h, r, pct: Math.round(h / 20 * 100) };
@@ -1228,7 +1228,7 @@ export default function App() {
       `grupo ${tm.group}`.toLowerCase().includes(q) ||
       tm.flag.includes(q)
     );
-    const getIds = tm => Array.from({length:20}, (_,i) => tm.base + i);
+    const getIds = tm => Array.from({length:20}, (_,i) => `${tm.id}-${i+1}`);
     if (filter === "missing")  t = t.filter(tm => getIds(tm).some(id => (stickers[id]??0) === 0));
     if (filter === "complete") t = t.filter(tm => getIds(tm).every(id => (stickers[id]??0) >= 1));
     if (filter === "repeats")  t = t.filter(tm => getIds(tm).some(id => (stickers[id]??0) >= 2));
@@ -1415,7 +1415,7 @@ export default function App() {
               const gTeams = filteredTeams.filter(t => t.group === g);
               if (gTeams.length === 0) return null;
               const gHave  = gTeams.reduce((s, t) => {
-                const ids = Array.from({length:20}, (_,i) => t.base + i);
+                const ids = Array.from({length:20}, (_,i) => `${t.id}-${i+1}`);
                 return s + ids.filter(id => (stickers[id]??0) >= 1).length;
               }, 0);
               const gTotal = gTeams.length * 20;
