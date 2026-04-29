@@ -8,11 +8,12 @@ import {
 
 // ─── PALETA ───────────────────────────────────────────────────────────────────
 const C = {
-  bg:"#F4EFE4", card:"#FFFFFF", dark:"#16120A",
+  bg:"#F5F5F5", card:"#FFFFFF", dark:"#1a1a1a",
   gold:"#C8981F", goldL:"#EFC84A",
   green:"#236B2E", greenL:"#4CAF50",
-  red:"#B83232", orange:"#D4631A", blue:"#1A4FAB",
-  purple:"#7A3FAB", border:"#DDD5BC", muted:"#7A6E54",
+  red:"#E8002D", orange:"#D4631A", blue:"#1A4FAB",
+  purple:"#7A3FAB", border:"#E0E0E0", muted:"#666666",
+  premium:"#E8002D", accentGreen:"#39FF14",
 };
 
 // ─── STORAGE ──────────────────────────────────────────────────────────────────
@@ -1059,11 +1060,12 @@ function StatsScreen({ stickers, isPremium, onUnlock }) {
                                                                                                                                                                       <button onClick={() => setMode('login')} style={{ flex:1, padding:'10px', border:'none', cursor:'pointer', fontFamily:'inherit', fontWeight:700, fontSize:14, background: mode==='login' ? C.gold : '#fff', color: mode==='login' ? '#fff' : C.dark }}>INICIAR SESIÓN</button>
                                                                                                                                                                                 <button onClick={() => setMode('register')} style={{ flex:1, padding:'10px', border:'none', cursor:'pointer', fontFamily:'inherit', fontWeight:700, fontSize:14, background: mode==='register' ? C.gold : '#fff', color: mode==='register' ? '#fff' : C.dark }}>REGISTRARSE</button>
                                                                                                                                                                                         </div>
-                                                                                                                                                                                                <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} style={{ width:'100%', padding:'12px', marginBottom:12, borderRadius:8, border:`1px solid ${C.border}`, fontFamily:'inherit', fontSize:15, boxSizing:'border-box' }} />
+                                                                                                                                                                                                <img src="/logo.jpeg" alt="WC Stickers 26" style={{width:140,borderRadius:"50%",marginBottom:20,display:"block",margin:"0 auto 20px"}} />
+        <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} style={{ width:'100%', padding:'12px', marginBottom:12, borderRadius:8, border:`1px solid ${C.border}`, fontFamily:'inherit', fontSize:15, boxSizing:'border-box' }} />
                                                                                                                                                                                                         <input type="password" placeholder="Contraseña" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key==='Enter' && handle()} style={{ width:'100%', padding:'12px', marginBottom:16, borderRadius:8, border:`1px solid ${C.border}`, fontFamily:'inherit', fontSize:15, boxSizing:'border-box' }} />
                                                                                                                                                                                                                 {error && <div style={{ color:'#c0392b', fontSize:13, marginBottom:12, textAlign:'center' }}>{error}</div>}
                                                                                                                                                                                                                         {msg && <div style={{ color:C.green, fontSize:13, marginBottom:12, textAlign:'center' }}>{msg}</div>}
-                                                                                                                                                                                                                                <button onClick={handle} disabled={loading} style={{ width:'100%', padding:'13px', borderRadius:8, border:'none', background:C.gold, color:'#fff', fontFamily:'inherit', fontWeight:800, fontSize:16, cursor:'pointer', letterSpacing:1 }}>
+                                                                                                                                                                                                                                <button onClick={handle} disabled={loading} style={{ width:'100%', padding:'13px', borderRadius:8, border:'none', background:C.premium, color:'#fff', fontFamily:'inherit', fontWeight:800, fontSize:16, cursor:'pointer', letterSpacing:1 }}>
                                                                                                                                                                                                                                           {loading ? 'Cargando...' : mode==='login' ? 'ENTRAR' : 'REGISTRARSE'}
                                                                                                                                                                                                                                                   </button>
 
@@ -1277,10 +1279,10 @@ export default function App() {
 
       {/* ── HEADER ── */}
       <div style={{
-        background:`linear-gradient(135deg,${C.dark} 0%,#2C1A06 100%)`,
+        background:"#FFFFFF",
         padding:"12px 15px 0",
         position:"sticky", top:0, zIndex:50,
-        boxShadow:"0 4px 24px rgba(0,0,0,0.4)",
+        boxShadow:"0 1px 8px rgba(0,0,0,0.08)",
       }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <div>
