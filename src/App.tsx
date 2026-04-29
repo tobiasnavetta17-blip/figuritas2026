@@ -274,15 +274,9 @@ function WAModal({ stickers, onClose }) {
   const [city,   setCity]   = useState(() => load("wa_city",""));
   const [copied, setCopied] = useState(false);
 
-  const numericMissing  = Array.from({length:TOTAL_ALBUM}, (_,i) => i+1)
-    .filter(n => (stickers[n]??0) === 0);
-  const numericRepeated = Object.entries(stickers)
-    .filter(([k,v]) => /^[A-Z]+-([1-9]|1[0-9]|20)$/.test(k) && v >= 2)
-    .map(([k]) => Number(k));
-  const extraRepeated = Object.entries(stickers)
-    .filter(([k,v]) => !/^[A-Z]+-([1-9]|1[0-9]|20)$/.test(k) && v >= 2)
-    .map(([k]) => k);
-  const allRepeated = [...numericRepeated, ...extraRepeated];
+    const _allTeamStickerIds = TEAMS.flatMap(t => Array.from({length:20}, (_,i) => `${t.id}-${i+1}`));
+    const numericMissing = _allTeamStickerIds.filter(id => (stickers[id]??0) === 0);
+    const allRepeated = Object.entries(stickers).filter(([,v]) => v >= 2).map(([k]) => k);
 
   const buildMsg = () => {
     const loc = city ? ` (${city})` : "";
