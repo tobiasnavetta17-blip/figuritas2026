@@ -1279,7 +1279,7 @@ export default function App() {
 
       {/* ── HEADER ── */}
       <div style={{
-        background:C.red,
+        background:C.dark,
         padding:"12px 15px 0",
         position:"sticky", top:0, zIndex:50,
         boxShadow:"0 2px 8px rgba(232,0,45,0.3)",
