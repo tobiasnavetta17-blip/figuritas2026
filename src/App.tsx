@@ -676,6 +676,12 @@ function PaymentReturnScreen({ state, onClose }) {
                                                                                   const [loading, setLoading] = React.useState(false);
 
                                                                                     const handleMPPayment = async () => {
+                                            const isAR = (navigator.language || '').includes('es-AR') ||
+                                              (Intl.DateTimeFormat().resolvedOptions().timeZone || '').includes('America/Argentina');
+                                            if (!isAR) {
+                                              window.open('https://figuritaswc26.lemonsqueezy.com/checkout/buy/497e39c9-2b88-4206-a2fb-76a0c418b61e', '_blank');
+                                              return;
+                                            }
                                                                                         setLoading(true);
                                                                                             try {
                                                                                                   const res = await fetch('https://api.mercadopago.com/checkout/preferences', {
