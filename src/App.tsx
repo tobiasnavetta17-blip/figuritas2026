@@ -1255,7 +1255,7 @@ export default function App() {
 
     // —— AUTH SCREEN
       if (authLoading) return (
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", background:C.bg, fontFamily:"'Barlow Condensed',sans-serif" }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"center", minHeight:"100vh", background:C.dark, background:C.bg, fontFamily:"'Barlow Condensed',sans-serif" }}>
                 <p style={{ color:C.dark, fontSize:18 }}>Cargando...</p>
                     </div>
                       );
@@ -1279,14 +1279,14 @@ export default function App() {
 
       {/* ── HEADER ── */}
       <div style={{
-        background:"#FFFFFF",
+        background:C.red,
         padding:"12px 15px 0",
         position:"sticky", top:0, zIndex:50,
-        boxShadow:"0 1px 8px rgba(0,0,0,0.08)",
+        boxShadow:"0 2px 8px rgba(232,0,45,0.3)",
       }}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
           <div>
-            <div style={{ fontSize:22, fontWeight:900, color:C.goldL, letterSpacing:1, lineHeight:1 }}>
+            <div style={{ fontSize:22, fontWeight:900, color:"white", letterSpacing:1, lineHeight:1 }}>
               🏆 MUNDIAL 2026
             </div>
             {session && (
