@@ -677,8 +677,8 @@ function PaymentReturnScreen({ state, onClose }) {
                                                                                   const [loading, setLoading] = React.useState(false);
 
                                                                                     const handleMPPayment = async () => {
-                                            const isAR = (navigator.language || '').includes('es-AR') ||
-                                              (Intl.DateTimeFormat().resolvedOptions().timeZone || '').includes('America/Argentina');
+                                            const isAR = (navigator.language || '').includes('es-AR') || (navigator.language || '').includes('es-419') ||
+                                              (Intl.DateTimeFormat().resolvedOptions().timeZone || '').includes('America/Argentina') || (Intl.DateTimeFormat().resolvedOptions().timeZone || '').includes('America/Buenos_Aires');
                                             if (!isAR) {
                                               window.open('https://figuritaswc26.lemonsqueezy.com/checkout/buy/497e39c9-2b88-4206-a2fb-76a0c418b61e', '_blank');
                                               return;
