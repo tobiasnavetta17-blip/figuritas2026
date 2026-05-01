@@ -786,6 +786,48 @@ function PaymentReturnScreen({ state, onClose }) {
 }
 
 // ─── STATS ────────────────────────────────────────────────────────────────────
+
+// ----- CANJEAR -----
+function CanjearScreen({ stickers, session, supabase }) {
+  const [ciudad, setCiudad] = React.useState("");
+  const [whatsapp, setWhatsapp] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+  const [msg, setMsg] = React.useState("");
+  const [canjeadores, setCanjeadores] = React.useState([]);
+  const [busqueda, setBusqueda] = React.useState("");
+  const [loadingList, setLoadingList] = React.useState(true);
+  React.useEffect(() => { fetchCanjeadores(); }, []);
+  const fetchCanjeadores = async () => {
+    setLoadingList(true);
+    const { data } = await supabase.from("canjeadores").select("*").order("created_at", { ascending: false });
+    setCanjeadores(data || []);
+    setLoadingList(false);
+  };
+  const publicar = async () => {
+    if (!session?.user?.id) { setMsg("Debés iniciar sesión para publicar."); return; }
+    if (!ciudad.trim() || !whatsapp.trim()) { setMsg("Completá ciudad y WhatsApp."); return; }
+    setLoading(true); setMsg("");
+    const repetidas = Object.entries(stickers).filter(([k,v]) => v >= 2).map(([k]) => k);
+    const faltantes = Object.entries(stickers).filter(([k,v]) => v === 0).map(([k]) => k);
+    const { error } = await supabase.from("canjeadores").upsert({ email: session.user.email, ciudad: ciudad.trim(), whatsapp: whatsapp.trim(), repetidas, faltantes }, { onConflict: "email" });
+    setLoading(false);
+    if (error) { setMsg("Error: " + error.message); } else { setMsg("¡Lista publicada!"); fetchCanjeadores(); }
+  };
+  const filtrados = canjeadores.filter(cx => !busqueda || cx.ciudad?.toLowerCase().includes(busqueda.toLowerCase()));
+  return (<div style={{ padding:"16px", maxWidth:480, margin:"0 auto" }}>
+    <div style={{ marginBottom:16, padding:16, background:C.card, borderRadius:12 }}>
+      <div style={{ fontSize:16, fontWeight:900, color:C.text, marginBottom:12 }}>Publicar mi lista</div>
+      <input placeholder="Ciudad" value={ciudad} onChange={e => setCiudad(e.target.value)} style={{ width:"100%", boxSizing:"border-box", padding:"10px 12px", marginBottom:8, background:C.bg, border:"1px solid "+C.border, borderRadius:8, color:C.text, fontSize:14 }} />
+      <input placeholder="Número de WhatsApp" value={whatsapp} onChange={e => setWhatsapp(e.target.value)} style={{ width:"100%", boxSizing:"border-box", padding:"10px 12px", marginBottom:12, background:C.bg, border:"1px solid "+C.border, borderRadius:8, color:C.text, fontSize:14 }} />
+      <button onClick={publicar} disabled={loading} style={{ width:"100%", padding:"12px 0", background:C.gold, border:"none", borderRadius:8, color:C.dark, fontSize:14, fontWeight:900, cursor:"pointer" }}>{loading ? "Publicando..." : "📤 Publicar mi lista"}</button>
+      {msg && <div style={{ marginTop:8, fontSize:12, color:msg.startsWith("Error") ? "#e74c3c" : C.muted, textAlign:"center" }}>{msg}</div>}
+    </div>
+    <div style={{ marginBottom:12 }}><input placeholder="🔍 Buscar por ciudad..." value={busqueda} onChange={e => setBusqueda(e.target.value)} style={{ width:"100%", boxSizing:"border-box", padding:"10px 12px", background:C.card, border:"1px solid "+C.border, borderRadius:8, color:C.text, fontSize:14 }} /></div>
+    <div style={{ fontSize:12, color:C.muted, marginBottom:8 }}>{loadingList ? "Cargando..." : filtrados.length + " canjeadores"}</div>
+    {filtrados.map((item, idx) => (<div key={idx} style={{ background:C.card, borderRadius:10, padding:"12px 14px", marginBottom:8, display:"flex", alignItems:"center", justifyContent:"space-between" }}><div><div style={{ fontWeight:800, color:C.text, fontSize:14 }}>{item.ciudad}</div><div style={{ fontSize:11, color:C.muted, marginTop:2 }}>{(item.repetidas||[]).length} repetidas · {(item.faltantes||[]).length} faltantes</div></div><a href={"https://wa.me/"+item.whatsapp} target="_blank" rel="noopener noreferrer" style={{ background:"#25D366", color:"#fff", borderRadius:8, padding:"8px 14px", fontSize:12, fontWeight:800, cursor:"pointer", textDecoration:"none" }}>Contactar</a></div>))}
+  </div>);
+}
+
 function StatsScreen({ stickers, isPremium, onUnlock }) {
   const numHave = Object.entries(stickers).filter(([k,v]) => /^([A-Z]+-([1-9]|1[0-9]|20)|FWC([1-9]|1[0-9])|CC([1-9]|1[0-2])|00)$/.test(k) && v >= 1).length;
   const numRep  = Object.entries(stickers).filter(([k,v]) => /^([A-Z]+-([1-9]|1[0-9]|20)|FWC([1-9]|1[0-9])|CC([1-9]|1[0-2])|00)$/.test(k) && v >= 2).length;
@@ -1351,6 +1393,7 @@ export default function App() {
             ["album",      "📖 ÁLBUM"],
             ["especiales", "✨ ESPECIALES"],
             ["stats",      "📊 STATS"],
+            ["canjear", "🎴 CANJEAR"],
           ].map(([k, l]) => (
             <button key={k} onClick={() => setTab(k)} style={{
               flex:1, padding:"9px 0", background:"none", border:"none",
@@ -1553,7 +1596,12 @@ export default function App() {
         <StatsScreen stickers={stickers} isPremium={isPremium} onUnlock={() => setModal("paywall")} />
       )}
 
-      {/* ── BOTTOM NAV ── */}
+      {/* — TAB CANJEAR — */}
+        {tab === "canjear" && (
+          <CanjearScreen stickers={stickers} session={session} supabase={supabase} />
+        )}
+
+        {/* ── BOTTOM NAV ── */}
       <div style={{
         position:"fixed", bottom:0, left:"50%", transform:"translateX(-50%)",
         width:"100%", maxWidth:480, background:C.card,
@@ -1561,7 +1609,7 @@ export default function App() {
         paddingBottom:"env(safe-area-inset-bottom,0px)",
       }}>
         {[
-          { emoji:"📲", label:"CANJEAR",  action:() => setModal("wa") },
+          { emoji:"📲", label:"CANJEAR",  action:() => setTab("canjear") },
           { emoji:"📥", label:"IMP/EXP",  action:() => setModal("importexport") },
           { emoji:"🔄", label:"RESETEAR", action:resetAll },
         ].map(item => (
