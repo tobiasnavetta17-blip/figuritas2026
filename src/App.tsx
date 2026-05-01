@@ -786,9 +786,9 @@ function PaymentReturnScreen({ state, onClose }) {
 
 // ─── STATS ────────────────────────────────────────────────────────────────────
 function StatsScreen({ stickers, isPremium, onUnlock }) {
-  const numHave = Object.entries(stickers).filter(([k,v]) => /^[A-Z]+-([1-9]|1[0-9]|20)$/.test(k) && v >= 1).length;
-  const numRep  = Object.entries(stickers).filter(([k,v]) => /^[A-Z]+-([1-9]|1[0-9]|20)$/.test(k) && v >= 2).length;
-  const extHave = Object.entries(stickers).filter(([k,v]) => !/^[A-Z]+-([1-9]|1[0-9]|20)$/.test(k) && v >= 1).length;
+  const numHave = Object.entries(stickers).filter(([k,v]) => /^([A-Z]+-([1-9]|1[0-9]|20)|FWC([1-9]|1[0-9])|CC([1-9]|1[0-2])|00)$/.test(k) && v >= 1).length;
+  const numRep  = Object.entries(stickers).filter(([k,v]) => /^([A-Z]+-([1-9]|1[0-9]|20)|FWC([1-9]|1[0-9])|CC([1-9]|1[0-2])|00)$/.test(k) && v >= 2).length;
+  const extHave = Object.entries(stickers).filter(([k,v]) => !/^([A-Z]+-([1-9]|1[0-9]|20)|FWC([1-9]|1[0-9])|CC([1-9]|1[0-2])|00)$/.test(k) && v >= 1).length;
 
   const teamStats = useMemo(() => TEAMS.map(t => {
     const ids = Array.from({length:20}, (_,i) => `${t.id}-${i+1}`);
@@ -1216,8 +1216,8 @@ export default function App() {
   }, []);
 
   const stats = useMemo(() => {
-    const numHave = Object.entries(stickers).filter(([k,v]) => /^[A-Z]+-([1-9]|1[0-9]|20)$/.test(k) && v >= 1).length;
-    const numRep  = Object.entries(stickers).filter(([k,v]) => /^[A-Z]+-([1-9]|1[0-9]|20)$/.test(k) && v >= 2).length;
+    const numHave = Object.entries(stickers).filter(([k,v]) => /^([A-Z]+-([1-9]|1[0-9]|20)|FWC([1-9]|1[0-9])|CC([1-9]|1[0-2])|00)$/.test(k) && v >= 1).length;
+    const numRep  = Object.entries(stickers).filter(([k,v]) => /^([A-Z]+-([1-9]|1[0-9]|20)|FWC([1-9]|1[0-9])|CC([1-9]|1[0-2])|00)$/.test(k) && v >= 2).length;
     return { numHave, numRep };
   }, [stickers]);
 
