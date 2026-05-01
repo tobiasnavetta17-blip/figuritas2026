@@ -760,7 +760,7 @@ function PaymentReturnScreen({ state, onClose }) {
         ))}
 
         <div style={{ textAlign:"center", margin:"18px 0 4px" }}>
-          <div style={{ fontSize:44, fontWeight:900, color:C.gold, lineHeight:1 }}>$1 USD</div>
+          <div style={{ fontSize:44, fontWeight:900, color:C.gold, lineHeight:1 }}>$1.500 ARS</div>
           <div style={{ color:C.muted, fontSize:9, letterSpacing:2 }}>PAGO ÚNICO · SIN SUSCRIPCIÓN</div>
         </div>
 
@@ -773,6 +773,7 @@ function PaymentReturnScreen({ state, onClose }) {
         }}>
           DESBLOQUEAR AHORA 🔓
         </button>
+        <div style={{ color:C.muted, fontSize:12, textAlign:'center', marginTop:4 }}>Serás redirigido a Mercado Pago para completar el pago</div>
         <button onClick={onClose} style={{
           width:"100%", padding:8, border:"none",
           background:"none", color:C.muted, fontSize:12, cursor:"pointer",
