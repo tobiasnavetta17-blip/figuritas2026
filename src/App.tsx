@@ -788,7 +788,7 @@ function PaymentReturnScreen({ state, onClose }) {
 // ─── STATS ────────────────────────────────────────────────────────────────────
 
 // ----- CANJEAR -----
-function CanjearScreen({ stickers, session, supabase }) {
+function CanjearScreen({ stickers, session, supabase, onOpenWA }) {
   const [ciudad, setCiudad] = React.useState("");
   const [whatsapp, setWhatsapp] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -815,6 +815,11 @@ function CanjearScreen({ stickers, session, supabase }) {
   };
   const filtrados = canjeadores.filter(cx => !busqueda || cx.ciudad?.toLowerCase().includes(busqueda.toLowerCase()));
   return (<div style={{ padding:"16px", maxWidth:480, margin:"0 auto" }}>
+  {onOpenWA && (
+    <button onClick={onOpenWA} style={{ display:"flex", alignItems:"center", gap:8, width:"100%", marginBottom:12, padding:"10px 16px", background:"#25D366", color:"#fff", border:"none", borderRadius:10, fontSize:14, fontWeight:700, cursor:"pointer" }}>
+      📱 Generar mensaje WhatsApp
+    </button>
+  )}
     <div style={{ marginBottom:16, padding:16, background:C.card, borderRadius:12 }}>
       <div style={{ fontSize:16, fontWeight:900, color:C.text, marginBottom:12 }}>Publicar mi lista</div>
       <input placeholder="Ciudad" value={ciudad} onChange={e => setCiudad(e.target.value)} style={{ width:"100%", boxSizing:"border-box", padding:"10px 12px", marginBottom:8, background:C.bg, border:"1px solid "+C.border, borderRadius:8, color:C.text, fontSize:14 }} />
@@ -1598,7 +1603,7 @@ export default function App() {
 
       {/* — TAB CANJEAR — */}
         {tab === "canjear" && (
-          <CanjearScreen stickers={stickers} session={session} supabase={supabase} />
+          <CanjearScreen stickers={stickers} session={session} supabase={supabase} onOpenWA={() => setModal("wa")} />
         )}
 
         {/* ── BOTTOM NAV ── */}
